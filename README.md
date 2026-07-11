@@ -10,11 +10,12 @@ Here is the structure of the project repository:
 
 ### 1. Jupyter Notebooks
 * **Directory:** `.` (Root)
-* **Purpose:** Contains interactive python notebooks demonstrating knowledge graph queries, indexing, text chunking, metadata propagation, and RAG workflows.
+* **Purpose:** Contains interactive python notebooks demonstrating knowledge graph queries, indexing, text chunking, metadata propagation, graph relationship structures, and advanced RAG query workflows.
 * **Key Files:**
   - `L2-query_with_cypher.ipynb`: Demonstrates how to connect to a Neo4j database using LangChain, query the movie knowledge graph with the Cypher query language (filtering, relationship matching, aggregation), and modify database records (creating, merging, and deleting nodes/relationships).
   - `L3-prep_text_for_RAG.ipynb`: Demonstrates how to create a vector index on Neo4j node properties, populate it by calculating vector embeddings via OpenAI API integration (using Cypher's `genai.vector.encode`), and run similarity search queries against the index.
   - `L4-construct_kg_from_text.ipynb`: Parses SEC Form 10-K JSON filings, chunks text sections (Item 1, 1a, 7, 7a) using LangChain's `RecursiveCharacterTextSplitter` with metadata (cik, cusip, source), inserts them into Neo4j as `:Chunk` nodes, indexes them, and builds a complete RAG question-answering workflow (`RetrievalQAWithSourcesChain`) with `ChatOpenAI`.
+  - `L5-add_relationships_to_kg.ipynb`: Structurizes a connected knowledge graph by creating parent `:Form` nodes, linking sequential `:Chunk` nodes together via `:NEXT` (using APOC link), connecting `:Chunk` nodes to their parent `:Form` node via `:PART_OF`, and linking the start of each section via `:SECTION`. It also introduces windowed retrieval using custom Cypher queries in LangChain to expand retrieval context.
 
 ---
 
@@ -31,7 +32,7 @@ graph TD
     classDef api fill:#4b5563,stroke:#10b981,stroke-width:2px,color:#fff;
     
     %% Flow nodes
-    Notebook["Jupyter Notebook (L2, L3 & L4)"] -->|Loads credentials| Env[".env Config"]
+    Notebook["Jupyter Notebook (L2 to L5)"] -->|Loads credentials| Env[".env Config"]
     Notebook -->|Splits & Prepares Docs| TextChunks["SEC 10-K Text Chunks"]
     TextChunks -->|Inserts Chunks & Metadata| DB[("Neo4j Database Instance")]
     
@@ -47,6 +48,35 @@ graph TD
     class OpenAI_LLM,OpenAI_Embeddings api;
 ```
 
+### SEC Knowledge Graph Schema (Lesson 5)
+
+This database schema visualizes how the documents are structured as a graph inside Neo4j, enabling windowed sequence retrieval:
+
+```mermaid
+graph LR
+    %% Define Node Styles
+    classDef formNode fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#fff;
+    classDef chunkNode fill:#1f2937,stroke:#10b981,stroke-width:2px,color:#fff;
+
+    Form["(:Form)"]
+    Chunk0["(:Chunk {chunkSeqId: 0})"]
+    Chunk1["(:Chunk {chunkSeqId: 1})"]
+    ChunkN["(:Chunk {chunkSeqId: n})"]
+
+    Form -->|SECTION {f10kItem}| Chunk0
+    Chunk0 -->|PART_OF| Form
+    Chunk1 -->|PART_OF| Form
+    ChunkN -->|PART_OF| Form
+
+    Chunk0 -->|NEXT| Chunk1
+    Chunk1 -->|NEXT| "... next chunks ..."
+    "... next chunks ..." -->|NEXT| ChunkN
+
+    %% Apply styles
+    class Form formNode;
+    class Chunk0,Chunk1,ChunkN chunkNode;
+```
+
 ---
 
 ## 🚀 Getting Started & Installation
@@ -55,7 +85,7 @@ Follow these steps to set up and run this project locally.
 
 ### Prerequisites
 - Python >= 3.9
-- Neo4j Database (e.g., a local Neo4j Desktop instance, Docker container, or Neo4j AuraDB instance)
+- Neo4j Database (e.g., a local Neo4j Desktop instance with APOC enabled, Docker container, or Neo4j AuraDB instance)
 - OpenAI API Key (required for vector embedding encoding and LLM generation)
 - Jupyter Notebook / JupyterLab or VS Code with Jupyter extension
 

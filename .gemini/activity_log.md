@@ -18,4 +18,9 @@
 ## [2026-07-11] Document & Commit Lesson 4
 - **Attempt**: Documenting L4-construct_kg_from_text.ipynb, updating README.md, updating activity log, staging files, committing, and pushing.
 - **Hypothesis**: Adding the new Lesson 4 SEC Form 10-K RAG notebook and describing it in the README keeps the repository's documentation completely in sync with the course progress.
+- **Observed Result/Outcome**: Successfully updated README.md to describe SEC parsing, `:Chunk` nodes creation, and LangChain QA RAG workflows, updated activity log, created commit `99df5cc` with message `feat: add Lesson 4 SEC Form 10-K RAG notebook and update README`, and pushed changes to remote branch `main` at https://github.com/PhoengZ/knowledgr-graph-RAG.git.
+
+## [2026-07-11] Document & Commit Lesson 5
+- **Attempt**: Documenting L5-add_relationships_to_kg.ipynb, updating README.md, updating activity log, staging files, committing, and pushing.
+- **Hypothesis**: Adding the new Lesson 5 SEC Knowledge Graph relationships notebook, document schema diagram, and describing it in the README keeps the repository's documentation completely in sync with the course progress.
 - **Observed Result/Outcome**: Pending staging and push.
