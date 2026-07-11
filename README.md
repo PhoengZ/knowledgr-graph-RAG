@@ -10,15 +10,16 @@ Here is the structure of the project repository:
 
 ### 1. Jupyter Notebooks
 * **Directory:** `.` (Root)
-* **Purpose:** Contains interactive python notebooks demonstrating knowledge graph queries and integration.
+* **Purpose:** Contains interactive python notebooks demonstrating knowledge graph queries, indexing, and RAG integration.
 * **Key Files:**
   - `L2-query_with_cypher.ipynb`: Demonstrates how to connect to a Neo4j database using LangChain, query the movie knowledge graph with the Cypher query language (filtering, relationship matching, aggregation), and modify database records (creating, merging, and deleting nodes/relationships).
+  - `L3-prep_text_for_RAG.ipynb`: Demonstrates how to create a vector index on Neo4j node properties, populate it by calculating vector embeddings via OpenAI API integration (using Cypher's `genai.vector.encode`), and run similarity search queries against the index.
 
 ---
 
 ## 🏗️ System Architecture
 
-The following diagram illustrates how the Python runtime, LangChain integration layer, and the Neo4j Graph Database communicate:
+The following diagram illustrates how the Python runtime, LangChain, the Neo4j Graph Database, and OpenAI API communicate:
 
 ```mermaid
 graph TD
@@ -26,16 +27,19 @@ graph TD
     classDef component fill:#1f2937,stroke:#3b82f6,stroke-width:2px,color:#fff;
     classDef database fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#fff;
     classDef config fill:#111827,stroke:#10b981,stroke-width:2px,color:#fff;
+    classDef api fill:#4b5563,stroke:#10b981,stroke-width:2px,color:#fff;
     
     %% Flow nodes
-    Notebook["Jupyter Notebook (L2-query_with_cypher.ipynb)"] -->|Loads credentials| Env[".env Config"]
-    Notebook -->|Executes Cypher Queries| LangChain["LangChain Neo4jGraph API"]
-    LangChain -->|Connects & Mutates| DB[("Neo4j Database Instance")]
+    Notebook["Jupyter Notebook (L2 & L3)"] -->|Loads credentials| Env[".env Config"]
+    Notebook -->|Executes Cypher & Langchain APIs| LangChain["LangChain Neo4jGraph API"]
+    LangChain -->|Connects & Runs Queries| DB[("Neo4j Database Instance")]
+    DB -->|Encodes taglines via Cypher| OpenAI["OpenAI Embeddings API"]
     
     %% Apply styles
     class Notebook,LangChain component;
     class DB database;
     class Env config;
+    class OpenAI api;
 ```
 
 ---
@@ -47,6 +51,7 @@ Follow these steps to set up and run this project locally.
 ### Prerequisites
 - Python >= 3.9
 - Neo4j Database (e.g., a local Neo4j Desktop instance, Docker container, or Neo4j AuraDB instance)
+- OpenAI API Key (required for Lesson 3 vector embedding encoding)
 - Jupyter Notebook / JupyterLab or VS Code with Jupyter extension
 
 ### Installation Steps
@@ -89,13 +94,13 @@ Follow these steps to set up and run this project locally.
    ```bash
    jupyter notebook
    ```
-   Open `L2-query_with_cypher.ipynb` and execute the cells.
+   Open the notebooks and execute the cells.
 
 ---
 
 ## ⚙️ Environmental Configuration (.env)
 
-The application requires the following environment variables to connect to your Neo4j instance. Add these to your `.env` file:
+The application requires the following environment variables to connect to your Neo4j instance and OpenAI. Add these to your `.env` file:
 
 ```env
 # ==========================================
@@ -112,4 +117,13 @@ NEO4J_PASSWORD=your_neo4j_password
 
 # [Optional] Target database name (defaults to 'neo4j')
 NEO4J_DATABASE=neo4j
+
+# ==========================================
+# OpenAI Configurations (Lesson 3 onwards)
+# ==========================================
+# [Required] API Key for OpenAI to run tagline vector embeddings
+OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx
+
+# [Required] Base API URL (e.g., if using custom base endpoints)
+OPENAI_BASE_URL=https://api.openai.com/v1
 ```
