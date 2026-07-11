@@ -16,6 +16,7 @@ Here is the structure of the project repository:
   - `L3-prep_text_for_RAG.ipynb`: Demonstrates how to create a vector index on Neo4j node properties, populate it by calculating vector embeddings via OpenAI API integration (using Cypher's `genai.vector.encode`), and run similarity search queries against the index.
   - `L4-construct_kg_from_text.ipynb`: Parses SEC Form 10-K JSON filings, chunks text sections (Item 1, 1a, 7, 7a) using LangChain's `RecursiveCharacterTextSplitter` with metadata (cik, cusip, source), inserts them into Neo4j as `:Chunk` nodes, indexes them, and builds a complete RAG question-answering workflow (`RetrievalQAWithSourcesChain`) with `ChatOpenAI`.
   - `L5-add_relationships_to_kg.ipynb`: Structurizes a connected knowledge graph by creating parent `:Form` nodes, linking sequential `:Chunk` nodes together via `:NEXT` (using APOC link), connecting `:Chunk` nodes to their parent `:Form` node via `:PART_OF`, and linking the start of each section via `:SECTION`. It also introduces windowed retrieval using custom Cypher queries in LangChain to expand retrieval context.
+  - `L6-expand_the_kg.ipynb`: Expands the knowledge graph by loading Form 13 CSV files containing institutional holdings, creating `:Company` and `:Manager` nodes, establishing `:FILED` and `:OWNS_STOCK_IN` relationships, and executing a custom Cypher retrieval query to enrich text chunk retrieval with relational holding facts.
 
 ---
 
@@ -32,8 +33,8 @@ graph TD
     classDef api fill:#4b5563,stroke:#10b981,stroke-width:2px,color:#fff;
     
     %% Flow nodes
-    Notebook["Jupyter Notebook (L2 to L5)"] -->|Loads credentials| Env[".env Config"]
-    Notebook -->|Splits & Prepares Docs| TextChunks["SEC 10-K Text Chunks"]
+    Notebook["Jupyter Notebook (L2 to L6)"] -->|Loads credentials| Env[".env Config"]
+    Notebook -->|Splits & Prepares Docs| TextChunks["SEC 10-K Text Chunks & Form 13 CSV"]
     TextChunks -->|Inserts Chunks & Metadata| DB[("Neo4j Database Instance")]
     
     Notebook -->|Instantiates| LangChain["LangChain Neo4jVector / QA Chain"]
@@ -48,20 +49,24 @@ graph TD
     class OpenAI_LLM,OpenAI_Embeddings api;
 ```
 
-### SEC Knowledge Graph Schema (Lesson 5)
+### SEC Knowledge Graph Schema (Lesson 6 Expanded)
 
-This database schema visualizes how the documents are structured as a graph inside Neo4j, enabling windowed sequence retrieval:
+This database schema visualizes how the documents and SEC holdings are structured as a graph inside Neo4j, enabling relational context enrichment during RAG retrieval:
 
 ```mermaid
-graph LR
+graph TD
     %% Define Node Styles
     classDef formNode fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#fff;
     classDef chunkNode fill:#1f2937,stroke:#10b981,stroke-width:2px,color:#fff;
+    classDef comNode fill:#8b5cf6,stroke:#a78bfa,stroke-width:2px,color:#fff;
+    classDef mgrNode fill:#d97706,stroke:#fbbf24,stroke-width:2px,color:#fff;
 
     Form["(:Form)"]
     Chunk0["(:Chunk {chunkSeqId: 0})"]
     Chunk1["(:Chunk {chunkSeqId: 1})"]
     ChunkN["(:Chunk {chunkSeqId: n})"]
+    Company["(:Company)"]
+    Manager["(:Manager)"]
 
     Form -->|SECTION {f10kItem}| Chunk0
     Chunk0 -->|PART_OF| Form
@@ -72,9 +77,14 @@ graph LR
     Chunk1 -->|NEXT| "... next chunks ..."
     "... next chunks ..." -->|NEXT| ChunkN
 
+    Company -->|FILED| Form
+    Manager -->|OWNS_STOCK_IN {shares, value}| Company
+
     %% Apply styles
     class Form formNode;
     class Chunk0,Chunk1,ChunkN chunkNode;
+    class Company comNode;
+    class Manager mgrNode;
 ```
 
 ---

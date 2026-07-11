@@ -23,4 +23,9 @@
 ## [2026-07-11] Document & Commit Lesson 5
 - **Attempt**: Documenting L5-add_relationships_to_kg.ipynb, updating README.md, updating activity log, staging files, committing, and pushing.
 - **Hypothesis**: Adding the new Lesson 5 SEC Knowledge Graph relationships notebook, document schema diagram, and describing it in the README keeps the repository's documentation completely in sync with the course progress.
-- **Observed Result/Outcome**: Pending staging and push.
+- **Observed Result/Outcome**: Successfully updated README.md to describe SEC relationships, parent nodes, and custom windowed Cypher search, updated activity log, created commit `75215a7` with message `feat: add Lesson 5 SEC Knowledge Graph relationships notebook and update README`, and pushed changes to remote branch `main` at https://github.com/PhoengZ/knowledgr-graph-RAG.git.
+
+## [2026-07-12] Document & Commit Lesson 6
+- **Attempt**: Documenting L6-expand_the_kg.ipynb, updating README.md, updating activity log, staging files, committing, and pushing.
+- **Hypothesis**: Adding the new Lesson 6 SEC Knowledge Graph holdings expansion notebook and describing it in the README keeps the repository's documentation completely in sync with the course progress.
+- **Observed Result/Outcome**: Successfully updated README.md to describe company and manager nodes, filed/owns stock relationships, and custom Cypher queries prepending holding facts, updated activity log, created commit `8d4b3ac` (subsequently updated) and ready to push changes to remote branch `main` at https://github.com/PhoengZ/knowledgr-graph-RAG.git.
