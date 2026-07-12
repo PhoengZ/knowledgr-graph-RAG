@@ -28,4 +28,4 @@
 ## [2026-07-12] Document & Commit Lesson 6
 - **Attempt**: Documenting L6-expand_the_kg.ipynb, updating README.md, updating activity log, staging files, committing, and pushing.
 - **Hypothesis**: Adding the new Lesson 6 SEC Knowledge Graph holdings expansion notebook and describing it in the README keeps the repository's documentation completely in sync with the course progress.
-- **Observed Result/Outcome**: Successfully updated README.md to describe company and manager nodes, filed/owns stock relationships, and custom Cypher queries prepending holding facts, updated activity log, created commit `8d4b3ac` (subsequently updated) and ready to push changes to remote branch `main` at https://github.com/PhoengZ/knowledgr-graph-RAG.git.
+- **Observed Result/Outcome**: Successfully updated README.md to describe company and manager nodes, filed/owns stock relationships, and custom Cypher queries prepending holding facts, updated activity log, created commit `4f95e3f` with message `feat: add Lesson 6 SEC Knowledge Graph expansion notebook and update README`, and pushed changes to remote branch `main` at https://github.com/PhoengZ/knowledgr-graph-RAG.git.
